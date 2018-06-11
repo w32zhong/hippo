@@ -2,3 +2,4 @@ bundle.js
 yarn.lock
 node_modules/
 *.swp
+memory/
