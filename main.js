@@ -9,7 +9,7 @@ const router = new VueRouter({
 	mode: 'history',
 	routes: [
 		{
-			path: '/:dirname/:filename',
+			path: '/*',
 			component: routeIndex
 		}
 	]

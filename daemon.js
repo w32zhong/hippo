@@ -13,10 +13,45 @@ const port = 3854;
 console.log('listen on port ' + port);
 app.listen(port);
 
-app.get('/get/:echostr/echo.api', function (req, res) {
-	const echostr = req.params.echostr;
-	res.json({"echo string": echostr});
+function is_dir(path) {
+	if (fs.existsSync(path)) {
+		const lstat = fs.lstatSync(path);
+		if (lstat.isSymbolicLink() || lstat.isDirectory())
+			return true;
+	}
+	return false;
+}
 
+app.get('/get/*dir.model', function (req, res) {
+	var ret = {
+		'dirs': [],
+		'cats': '',
+		'error': ''
+	};
+	var request_dir = req.params[0];
+	request_dir = './memory/' + request_dir;
+
+	request_dir = path.resolve(request_dir);
+	console.log('visit: ' + request_dir);
+
+	if (is_dir(request_dir)) {
+		var files = fs.readdirSync(request_dir);
+		files.forEach(file => {
+			const fpath = request_dir + '/' + file;
+			const exten = file.split('.')[1];
+			if (!is_dir(fpath)) {
+				if (exten != 'json')
+					ret.cats += "\n === " + fpath + " ===\n";
+				else
+					ret.cats += fs.readFileSync(fpath) + ',';
+			}
+			ret.dirs.push(file);
+		});
+	} else if (fs.existsSync(request_dir)) {
+		ret.cats += fs.readFileSync(request_dir);
+	}
+
+	res.json(ret);
 });
 
 process.on( 'SIGINT', function() {

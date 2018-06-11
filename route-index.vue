@@ -1,20 +1,24 @@
 <template>
 <div>
-<button v-on:click="toggleCal()">toggle calendar</button>
-<button v-on:click="setSource()">setSource</button>
-
-<div id='calendar'></div>
 <ul>
-	<li v-for="item in list">
-		{{item}}
+	<li v-for="f in data.dirs">
+		<router-link v-bind:to="$route.path + '/' + f + '/'">
+			{{f}}
+		</router-link>
 	</li>
 </ul>
+<div id='calendar'></div>
+<pre id='plaintxt'></pre>
 </div>
 </template>
 
 <script>
 import $ from 'jquery';
 import 'fullcalendar';
+
+String.prototype.replaceAt = function(index, character) {
+	return this.substr(0, index) + character + this.substr(index+character.length);
+};
 
 $(function() {
 	$('#calendar').fullCalendar({
@@ -31,21 +35,7 @@ $(function() {
 		editable: false,
 		weekends: true,
 		EventLimit: false,
-		events: [
-			{
-				title: 'Algorithm Office Hour',
-				description: 'GOL-3576',
-				dow: [3],
-				start: '11:00',
-				end: '12:30'
-			},
-			{
-				title: 'Pattern Recognition - CSCI 737 \n',
-				dow: [1, 3, 5],
-				start: '14:30',
-				end: '15:25'
-			}
-		],
+		events: [],
 		eventRender: function(event, element) {
 			element.find('.fc-title').append(" [" + event.description + "]");
 		}
@@ -55,46 +45,66 @@ $(function() {
 export default {
 	data: function () {
 		return {
-			'list': [],
+			"data": {},
 		};
 	},
 	created: function () {
-		var vm = this;
-		vm.list = ['a', 'b', 'c'];
-
-//		$.ajax({
-//			type : "GET",
-//			url : "get/index.list",
-//			contentType: "application/json; charset=utf-8",
-//			dataType: "json",
-//		}).done(function (json) {
-//			console.log(json);
-//			vm.filelist = json['filelist'];
-//			vm.runlist = json['runlist'];
-//			vm.download = json['download'];
-//		});
-
+		this.updateData();
+	},
+	beforeRouteUpdate (to, from, next) {
+		this.name = to.params.name;
+		next();
+		this.updateData();
+		console.log('Route updated.');
 	},
 	methods: {
 		refreshCal: function (arr_events) {
-			$("#calendar").fullCalendar('removeEvents', (_) => {return true});
-			$('#calendar').fullCalendar('addEventSource', arr_events);
+			setTimeout(() => {
+				$("#calendar").fullCalendar('removeEvents', (_) => {return true});
+			}, 300);
+			setTimeout(() => {
+				$('#calendar').fullCalendar('addEventSource', arr_events);
+			}, 600);
 		},
-		toggleCal: function () {
-			$("#calendar").toggle();
-		},
-		setSource: function () {
-			var newschedule = [
-				{
-					title:  'AA',
-					dow: [2, 4],
-					start: '16:30',
-					end: '18:05'
-				}
-			];
+		updateData: function () {
+			const visit_path = this.$route.params[0];
+			const request_path = "/get/" + visit_path + "dir.model";
+			var vm = this;
+			vm.data = {};
 
-			console.log('refresh ...');
-			this.refreshCal(newschedule);
+			$.ajax({
+				type : "GET",
+				url : request_path,
+				contentType: "application/json; charset=utf-8",
+				dataType: "json",
+			}).done(function (json) {
+				vm.data = json;
+				vm.updateView();
+			});
+		},
+		updateView: function () {
+			var cats = this.data.cats.trim();
+			if (cats == '') {
+				$('#calendar').hide();
+				$('#plaintxt').text('');
+				return;
+			} else if (cats[cats.length - 1] == ',') {
+				cats = cats.replaceAt(cats.length - 1, ' ');
+			}
+			var j = {};
+			try {
+				j = JSON.parse('[' + cats + ']');
+			} catch (e) {
+				$('#calendar').hide();
+				$('#plaintxt').text(cats);
+				return;
+			}
+			// console.log('update Calendar')
+			// console.log(j)
+			this.refreshCal(j);
+			const pretty = JSON.stringify(j, null, 4);
+			$('#plaintxt').text(pretty);
+			$('#calendar').show();
 		}
 	}
 };

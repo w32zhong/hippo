@@ -1,0 +1,14 @@
+{
+	"title": "Independent Study",
+	"description": "GOL-3551",
+	"dow": [2],
+	"start": "09:00",
+	"end": "10:00"
+},
+{
+	"title": "CISC830 Kwon, Minseok",
+	"description": "GOL-1445",
+	"dow": [2, 4],
+	"start": "12:30",
+	"end": "13:50"
+}
