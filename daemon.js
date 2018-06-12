@@ -1,3 +1,5 @@
+const express_auth_path = '../auth/express-auth.js';
+
 var process = require('process');
 var express = require('express');
 var bodyParser = require('body-parser');
@@ -5,6 +7,14 @@ var path = require('path');
 var app = express();
 var fs = require('fs');
 var history = require('connect-history-api-fallback'); // handle refresh for SPA
+var expAuth = require(express_auth_path);
+
+/* setup authentication module */
+expAuth.init(app, {
+	loginRoute: '/auth/login',
+	verifyUrl: 'http://localhost/auth/token_verify',
+	keyName: 'tk-auth'
+});
 
 app.use(history({verbose: true}));
 app.use(express.static('.'));
@@ -22,14 +32,14 @@ function is_dir(path) {
 	return false;
 }
 
-app.get('/get/*dir.model', function (req, res) {
+app.get('/get/*dir.model', expAuth.middleware, function (req, res) {
 	var ret = {
 		'dirs': [],
 		'cats': '',
 		'error': ''
 	};
 	var request_dir = req.params[0];
-	request_dir = './memory/' + request_dir;
+	request_dir = './' + request_dir;
 
 	request_dir = path.resolve(request_dir);
 	console.log('visit: ' + request_dir);

@@ -35,11 +35,13 @@ $(function() {
 		editable: false,
 		weekends: true,
 		EventLimit: false,
+		contentHeight: "auto",
 		events: [],
 		eventRender: function(event, element) {
 			element.find('.fc-title').append(" [" + event.description + "]");
 		}
 	});
+	$('#calendar').hide();
 });
 
 export default {
@@ -66,20 +68,42 @@ export default {
 				$('#calendar').fullCalendar('addEventSource', arr_events);
 			}, 600);
 		},
-		updateData: function () {
-			const visit_path = this.$route.params[0];
-			const request_path = "/get/" + visit_path + "dir.model";
-			var vm = this;
-			vm.data = {};
-
+		testAuth: function (request_path, callbk) {
 			$.ajax({
 				type : "GET",
 				url : request_path,
-				contentType: "application/json; charset=utf-8",
-				dataType: "json",
-			}).done(function (json) {
-				vm.data = json;
-				vm.updateView();
+				dataType: "html",
+				success: function(a, b, xhr) {
+					var ct = xhr.getResponseHeader("content-type") || "";
+					if (ct.indexOf('json') > -1) {
+						/* JSON returned, continue. */
+						console.log('JSON returned.');
+						callbk();
+					} else {
+						console.log('non-JSON returned.');
+						const cur_url = window.location.href;
+						window.location.href = '/auth/login?next=' +
+						encodeURIComponent(cur_url);
+					}
+				}
+			});
+		},
+		updateData: function () {
+			const visit_path = this.$route.params[0];
+			const request_path = "/hippo/get/" + visit_path + "dir.model";
+			var vm = this;
+			vm.data = {};
+
+			this.testAuth(request_path, function () {
+				$.ajax({
+					type : "GET",
+					url : request_path,
+					contentType: "application/json; charset=utf-8",
+					dataType: "json",
+				}).done(function (json) {
+					vm.data = json;
+					vm.updateView();
+				});
 			});
 		},
 		updateView: function () {
