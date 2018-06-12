@@ -50,10 +50,12 @@ app.get('/get/*dir.model', expAuth.middleware, function (req, res) {
 			const fpath = request_dir + '/' + file;
 			const exten = file.split('.')[1];
 			if (!is_dir(fpath)) {
-				if (exten != 'json')
+				if (exten != 'json') {
 					ret.cats += "\n === " + fpath + " ===\n";
-				else
+					ret.cats += fs.readFileSync(fpath);
+				} else {
 					ret.cats += fs.readFileSync(fpath) + ',';
+				}
 			}
 			ret.dirs.push(file);
 		});
