@@ -1,5 +1,6 @@
 <template>
 <div>
+<button v-on:click="$router.go(-1)">go back</button>
 <button v-on:click="updateData">refresh</button>
 <ul>
 	<li v-for="f in data.dirs">
