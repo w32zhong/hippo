@@ -2,6 +2,7 @@
 <div>
 <button v-on:click="$router.go(-1)">go back</button>
 <button v-on:click="updateData">refresh</button>
+<button v-on:click="goto_edit">edit</button>
 <ul>
 	<li v-for="f in data.dirs">
 		<router-link v-bind:to="$route.path + '/' + f + '/'">
@@ -18,6 +19,8 @@
 import $ from 'jquery';
 import 'fullcalendar';
 var moment = require('moment');
+
+var edit_url = '/droppy/#/proj/tkcloud/hippo/hippo'
 
 String.prototype.replaceAt = function(index, character) {
 	return this.substr(0, index) + character + this.substr(index+character.length);
@@ -65,6 +68,9 @@ export default {
 		console.log('Route updated.');
 	},
 	methods: {
+		goto_edit: function () {
+			window.location.href = edit_url;
+		},
 		adjustStartDate: function (ev, field, value) {
 			var m = moment(ev.start);
 			m.set(field, value);

@@ -1,4 +1,5 @@
 const express_auth_path = '../auth/express-auth.js';
+const enable_authentication = true;
 
 var process = require('process');
 var express = require('express');
@@ -7,14 +8,18 @@ var path = require('path');
 var app = express();
 var fs = require('fs');
 var history = require('connect-history-api-fallback'); // handle refresh for SPA
-//var expAuth = require(express_auth_path);
-//
-///* setup authentication module */
-//expAuth.init(app, {
-//	loginRoute: '/auth/login',
-//	verifyUrl: 'http://localhost/auth/token_verify',
-//	keyName: 'tk-auth'
-//});
+var expAuth = {"middleware": function (req, res, next) {return next();}};
+
+if (enable_authentication) {
+	var expAuth = require(express_auth_path);
+
+	/* setup authentication module */
+	expAuth.init(app, {
+		loginRoute: '/auth/login',
+		verifyUrl: 'http://localhost/auth/token_verify',
+		keyName: 'tk-auth'
+	});
+}
 
 app.use(history({verbose: true}));
 app.use('/hippo', express.static('.'))
@@ -34,7 +39,7 @@ function is_dir(path) {
 
 app.get('/index.html', function (req, res) {
 	res.sendFile('index.html', {root: './'});
-}).get('/hippo/get/*dir.model', /*expAuth.middleware,*/ function (req, res) {
+}).get('/hippo/get/*dir.model', expAuth.middleware, function (req, res) {
 	var ret = {
 		'dirs': [],
 		'cats': '',
