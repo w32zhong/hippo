@@ -87,7 +87,8 @@ export default {
 			return list_ev;
 		},
 		refreshCal: function (arr_events) {
-			$("#calendar").fullCalendar('removeEvents');
+			console.log('refresh events ...');
+			$("#calendar").fullCalendar('removeEventSources');
 			var vm = this;
 			setTimeout(() => {
 				// $('#calendar').fullCalendar('addEventSource', arr_events);
@@ -117,7 +118,7 @@ export default {
 					}
 					callbk(processed_events);
 				});
-			}, 600);
+			}, 300);
 		},
 		testAuth: function (request_path, callbk) {
 			$.ajax({

@@ -17,7 +17,6 @@ var history = require('connect-history-api-fallback'); // handle refresh for SPA
 //});
 
 app.use(history({verbose: true}));
-app.use(express.static('.'));
 app.use('/hippo', express.static('.'))
 app.use(bodyParser.json());
 const port = 3854;
@@ -33,7 +32,9 @@ function is_dir(path) {
 	return false;
 }
 
-app.get('/hippo/get/*dir.model', /*expAuth.middleware,*/ function (req, res) {
+app.get('/index.html', function (req, res) {
+	res.sendFile('index.html', {root: './'});
+}).get('/hippo/get/*dir.model', /*expAuth.middleware,*/ function (req, res) {
 	var ret = {
 		'dirs': [],
 		'cats': '',
