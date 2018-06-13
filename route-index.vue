@@ -38,7 +38,9 @@ $(function() {
 		contentHeight: "auto",
 		events: [],
 		eventRender: function(event, element) {
-			element.find('.fc-title').append(" [" + event.description + "]");
+			if (event.description) {
+				element.find('.fc-title').append(" [" + event.description + "]");
+			}
 		}
 	});
 	$('#calendar').hide();
