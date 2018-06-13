@@ -1,5 +1,6 @@
 <template>
 <div>
+<button v-on:click="updateData">refresh</button>
 <ul>
 	<li v-for="f in data.dirs">
 		<router-link v-bind:to="$route.path + '/' + f + '/'">
