@@ -65,35 +65,55 @@ export default {
 		console.log('Route updated.');
 	},
 	methods: {
+		adjustStartDate: function (ev, field, value) {
+			var m = moment(ev.start);
+			m.set(field, value);
+			ev.start = m.format("YYYY-MM-DD HH:mm");
+		},
+		monthsBetween: function (ev, begin, end) {
+			var m = begin.clone()
+			m.set('date', 1);
+			var list_ev = [];
+			do {
+				const new_ev = Object.assign({}, ev);
+				this.adjustStartDate(new_ev, 'year', m.year());
+				this.adjustStartDate(new_ev, 'month', m.month());
+				list_ev.push(new_ev);
+				m.add(1, 'months');
+				// console.log(m.format());
+				// console.log('is before')
+				// console.log(end.format());
+			} while (m.isBefore(end));
+			return list_ev;
+		},
 		refreshCal: function (arr_events) {
 			$("#calendar").fullCalendar('removeEvents');
+			var vm = this;
 			setTimeout(() => {
 				// $('#calendar').fullCalendar('addEventSource', arr_events);
 				$('#calendar').fullCalendar('addEventSource',
-				function (start, end, timezone, callbk) {
+				function (begin, end, timezone, callbk) {
+					// console.log('BEGIN'); console.log(begin);
+					// console.log('END'); console.log(end);
 					var processed_events = [];
-					for	(var i = 0; i < arr_events.length; i++) {
+					for (var i = 0; i < arr_events.length; i++) {
 						var ev = arr_events[i];
 						if (ev.yearly == true) {
-							var m = moment(ev.start);
-							if (m.isAfter(start)) {
-								m.set('year', start.year()); /* set to this year */
-							} else {
-								m.set('year', end.year()); /* set to this year */
+							for	(var yr = begin.year(); yr <= end.year(); yr ++) {
+								const new_ev = Object.assign({}, ev);
+								vm.adjustStartDate(new_ev, 'year', yr);
+								// console.log(new_ev);
+								processed_events.push(new_ev);
 							}
-							ev.start = m.format("YYYY-MM-DD HH:mm");
 						} else if (ev.monthly == true) {
-							var m = moment(ev.start);
-							if (m.isAfter(start)) {
-								m.set('year', start.year()); /* set to this year */
-								m.set('month', start.month()); /* set to this month */
-							} else {
-								m.set('year', end.year()); /* set to this year */
-								m.set('month', end.month()); /* set to this month */
-							}
-							ev.start = m.format("YYYY-MM-DD HH:mm");
+							const list_ev = vm.monthsBetween(ev, begin, end);
+							// console.log(list_ev);
+							list_ev.forEach(function (new_ev) {
+								processed_events.push(new_ev);
+							});
+						} else {
+							processed_events.push(ev);
 						}
-						processed_events.push(ev);
 					}
 					callbk(processed_events);
 				});
