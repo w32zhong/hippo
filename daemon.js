@@ -7,17 +7,18 @@ var path = require('path');
 var app = express();
 var fs = require('fs');
 var history = require('connect-history-api-fallback'); // handle refresh for SPA
-var expAuth = require(express_auth_path);
-
-/* setup authentication module */
-expAuth.init(app, {
-	loginRoute: '/auth/login',
-	verifyUrl: 'http://localhost/auth/token_verify',
-	keyName: 'tk-auth'
-});
+//var expAuth = require(express_auth_path);
+//
+///* setup authentication module */
+//expAuth.init(app, {
+//	loginRoute: '/auth/login',
+//	verifyUrl: 'http://localhost/auth/token_verify',
+//	keyName: 'tk-auth'
+//});
 
 app.use(history({verbose: true}));
 app.use(express.static('.'));
+app.use('/hippo', express.static('.'))
 app.use(bodyParser.json());
 const port = 3854;
 console.log('listen on port ' + port);
@@ -32,7 +33,7 @@ function is_dir(path) {
 	return false;
 }
 
-app.get('/get/*dir.model', expAuth.middleware, function (req, res) {
+app.get('/hippo/get/*dir.model', /*expAuth.middleware,*/ function (req, res) {
 	var ret = {
 		'dirs': [],
 		'cats': '',

@@ -17,6 +17,7 @@
 <script>
 import $ from 'jquery';
 import 'fullcalendar';
+var moment = require('moment');
 
 String.prototype.replaceAt = function(index, character) {
 	return this.substr(0, index) + character + this.substr(index+character.length);
@@ -65,11 +66,37 @@ export default {
 	},
 	methods: {
 		refreshCal: function (arr_events) {
+			$("#calendar").fullCalendar('removeEvents');
 			setTimeout(() => {
-				$("#calendar").fullCalendar('removeEvents', (_) => {return true});
-			}, 300);
-			setTimeout(() => {
-				$('#calendar').fullCalendar('addEventSource', arr_events);
+				// $('#calendar').fullCalendar('addEventSource', arr_events);
+				$('#calendar').fullCalendar('addEventSource',
+				function (start, end, timezone, callbk) {
+					var processed_events = [];
+					for	(var i = 0; i < arr_events.length; i++) {
+						var ev = arr_events[i];
+						if (ev.yearly == true) {
+							var m = moment(ev.start);
+							if (m.isAfter(start)) {
+								m.set('year', start.year()); /* set to this year */
+							} else {
+								m.set('year', end.year()); /* set to this year */
+							}
+							ev.start = m.format("YYYY-MM-DD HH:mm");
+						} else if (ev.monthly == true) {
+							var m = moment(ev.start);
+							if (m.isAfter(start)) {
+								m.set('year', start.year()); /* set to this year */
+								m.set('month', start.month()); /* set to this month */
+							} else {
+								m.set('year', end.year()); /* set to this year */
+								m.set('month', end.month()); /* set to this month */
+							}
+							ev.start = m.format("YYYY-MM-DD HH:mm");
+						}
+						processed_events.push(ev);
+					}
+					callbk(processed_events);
+				});
 			}, 600);
 		},
 		testAuth: function (request_path, callbk) {

@@ -12,3 +12,22 @@
 	"start": "12:30",
 	"end": "13:50"
 }
+,
+{
+	"title": "Jiajia Birthday",
+	"yearly": true,
+	"start": "1991-06-22 07:00"
+}
+,
+{
+	"title": "My Birthday",
+	"yearly": true,
+	"start": "1989-12-21 07:00"
+}
+,
+{
+	"title": "Lease monthly check",
+	"description": "2/2/2018 to 1/30/2019, $775",
+	"monthly": true,
+	"start": "1989-01-02 07:00"
+}
