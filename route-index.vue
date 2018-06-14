@@ -11,7 +11,7 @@
 	</li>
 </ul>
 <div id='calendar'></div>
-<pre id='plaintxt'></pre>
+<div id='plaintxt'></div>
 </div>
 </template>
 
@@ -21,10 +21,6 @@ import 'fullcalendar';
 var moment = require('moment');
 
 var edit_url = '/droppy/#/proj/tkcloud/hippo/hippo'
-
-String.prototype.replaceAt = function(index, character) {
-	return this.substr(0, index) + character + this.substr(index+character.length);
-};
 
 $(function() {
 	$('#calendar').fullCalendar({
@@ -164,28 +160,42 @@ export default {
 				});
 			});
 		},
+		colorText: function (father, cats) {
+			const colors = ['red', '#009688'];
+			var i = 0;
+			for (var j = 0; j < cats.length; j ++) {
+				var cat = cats[j];
+				var color = colors[i];
+				if (cat.trim() == '')
+					continue;
+				i = (i + 1) % 2;
+				father.append('<pre style="color:' + color +
+				              '">' + cat + '<pre>')
+			}
+		},
 		updateView: function () {
-			var cats = this.data.cats.trim();
-			if (cats == '') {
+			var cats = this.data.cats;
+			const cats_string = cats.join().trim();
+			/* print out calendar/plaintxt */
+			if (cats_string == '') {
 				$('#calendar').hide();
 				$('#plaintxt').text('');
 				return;
-			} else if (cats[cats.length - 1] == ',') {
-				cats = cats.replaceAt(cats.length - 1, ' ');
 			}
+			/* see if the json concatenation is valid */
 			var j = {};
 			try {
-				j = JSON.parse('[' + cats + ']');
+				j = JSON.parse('[' + cats_string + ']');
 			} catch (e) {
 				$('#calendar').hide();
-				$('#plaintxt').text(cats);
+				this.colorText($('#plaintxt'), cats);
 				return;
 			}
 			// console.log('update Calendar')
 			// console.log(j)
 			this.refreshCal(j);
 			const pretty = JSON.stringify(j, null, 4);
-			$('#plaintxt').text(pretty);
+			$('#plaintxt').append('<pre>' + pretty + '</pre>');
 			$('#calendar').show();
 		}
 	}

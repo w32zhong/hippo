@@ -38,11 +38,18 @@ function is_dir(path) {
 }
 
 app.get('/index.html', function (req, res) {
-	res.sendFile('index.html', {root: './'});
+	console.log(req.originalUrl);
+	if (req.originalUrl.indexOf('auth/login') == -1) {
+		res.sendFile('index.html', {root: './'});
+	} else {
+		/* avoid infinite redirections */
+		console.log('Infinite redirections avoided !!!');
+		res.status(404).send('Not found');
+	}
 }).get('/hippo/get/*dir.model', expAuth.middleware, function (req, res) {
 	var ret = {
 		'dirs': [],
-		'cats': '',
+		'cats': [],
 		'error': ''
 	};
 	var request_dir = req.params[0];
@@ -58,16 +65,19 @@ app.get('/index.html', function (req, res) {
 			const exten = file.split('.')[1];
 			if (!is_dir(fpath)) {
 				if (exten != 'json') {
-					ret.cats += "\n === " + fpath + " ===\n";
-					ret.cats += fs.readFileSync(fpath);
+					var content = fs.readFileSync(fpath).toString();
+					content = path.basename(fpath) + "\n" + content;
+					ret.cats.push(content + "\n");
 				} else {
-					ret.cats += fs.readFileSync(fpath) + ',';
+					const content = fs.readFileSync(fpath).toString();
+					ret.cats.push(content);
 				}
 			}
 			ret.dirs.push(file);
 		});
 	} else if (fs.existsSync(request_dir)) {
-		ret.cats += fs.readFileSync(request_dir);
+		const content = fs.readFileSync(request_dir).toString();
+		ret.cats.push(content);
 	}
 
 	res.json(ret);
