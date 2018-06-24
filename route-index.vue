@@ -163,6 +163,7 @@ export default {
 		colorText: function (father, cats) {
 			const colors = ['red', '#009688'];
 			var i = 0;
+			father.text(''); /* clear old */
 			for (var j = 0; j < cats.length; j ++) {
 				var cat = cats[j];
 				var color = colors[i];
