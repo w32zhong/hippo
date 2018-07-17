@@ -1,4 +1,4 @@
-const express_auth_path = '../auth/express-auth.js';
+const express_auth_path = '../tkcloud/auth/express-auth.js';
 const enable_authentication = true;
 
 var process = require('process');
