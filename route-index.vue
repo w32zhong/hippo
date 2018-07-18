@@ -20,7 +20,7 @@ import $ from 'jquery';
 import 'fullcalendar';
 var moment = require('moment');
 
-var edit_url = '/droppy/#/proj/tkcloud/hippo/hippo'
+var edit_url = '/droppy/#/proj/hippo/hippo'
 
 $(function() {
 	$('#calendar').fullCalendar({
