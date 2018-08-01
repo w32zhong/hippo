@@ -55,6 +55,13 @@ app.get('/index.html', function (req, res) {
 	var request_dir = req.params[0];
 	request_dir = './' + request_dir;
 
+	/* safe guard to avoid visiting unexpected folder */
+	if (request_dir.indexOf('hippo') == -1) {
+		ret.error = 'not under ./hippo directory.';
+		res.json(ret);
+		return;
+	}
+
 	request_dir = path.resolve(request_dir);
 	console.log('visit: ' + request_dir);
 
@@ -62,7 +69,8 @@ app.get('/index.html', function (req, res) {
 		var files = fs.readdirSync(request_dir);
 		files.forEach(file => {
 			const fpath = request_dir + '/' + file;
-			const exten = file.split('.')[1];
+			const exten = file.split('.').pop();
+			if (exten == 'swp') return;
 			if (!is_dir(fpath)) {
 				if (exten != 'json') {
 					var content = fs.readFileSync(fpath).toString();

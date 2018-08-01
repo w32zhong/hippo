@@ -3,6 +3,7 @@
 <button v-on:click="$router.go(-1)">go back</button>
 <button v-on:click="updateData">refresh</button>
 <button v-on:click="goto_edit">edit</button>
+<p v-if="data.error">{{data.error}}<p>
 <ul>
 	<li v-for="f in data.dirs">
 		<router-link v-bind:to="$route.path + '/' + f + '/'">
@@ -39,9 +40,9 @@ $(function() {
 		EventLimit: false,
 		contentHeight: "auto",
 		events: [],
-		eventRender: function(event, element) {
-			if (event.description) {
-				element.find('.fc-title').append(" [" + event.description + "]");
+		eventRender: function(eve, element) {
+			if (eve.description) {
+				element.find('.fc-title').append(" [" + eve.description + "]");
 			}
 		}
 	});
@@ -101,6 +102,17 @@ export default {
 					var processed_events = [];
 					for (var i = 0; i < arr_events.length; i++) {
 						var ev = arr_events[i];
+						/* make it colorful */
+						if (ev.yearly) {
+							ev.color = 'red';
+						} else if (ev.monthly) {
+							ev.color = 'blue';
+						} else if (ev.dow) {
+							ev.color = 'grey';
+						} else {
+							ev.color = 'gold';
+						}
+						/* recurr handlers */
 						if (ev.yearly == true) {
 							for	(var yr = begin.year(); yr <= end.year(); yr ++) {
 								const new_ev = Object.assign({}, ev);
