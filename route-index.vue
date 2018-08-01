@@ -21,7 +21,7 @@ import $ from 'jquery';
 import 'fullcalendar';
 var moment = require('moment');
 
-var edit_url = '/droppy/#/proj/hippo/hippo'
+const edit_url = '/droppy/#/proj/hippo/hippo'
 
 $(function() {
 	$('#calendar').fullCalendar({
@@ -66,7 +66,7 @@ export default {
 	},
 	methods: {
 		goto_edit: function () {
-			window.location.href = edit_url;
+			window.open(edit_url, '_blank');
 		},
 		adjustStartDate: function (ev, field, value) {
 			var m = moment(ev.start);
