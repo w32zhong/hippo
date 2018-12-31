@@ -155,7 +155,7 @@ export default {
 			});
 		},
 		updateData: function () {
-			const visit_path = this.$route.params[0];
+			const visit_path = this.$route.params['pathMatch'];
 			const request_path = "/hippo/get/" + visit_path + "dir.model";
 			var vm = this;
 			vm.data = {};
