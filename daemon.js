@@ -16,7 +16,7 @@ if (enable_authentication) {
 	/* setup authentication module */
 	expAuth.init(app, {
 		loginRoute: '/auth/login',
-		verifyUrl: 'http://localhost/auth/token_verify',
+		verifyUrl: 'http://127.0.0.1/auth/token_verify',
 		keyName: 'tk-auth'
 	});
 }
